@@ -41,15 +41,13 @@ def create_acl_policy(policy):
         name=policy['name'], policy=policy['policy'])
         return print(f"[+] policy '{policy['name']}' has been activated")
     
-
+    
 # Step 2. Enable auth method
 def enable_auth_method(auth_method):
     # Check if the auth method exists already. If it does, print the current methods. Else, create a new one.
     list_auth_methods = APP.sys.list_auth_methods()
-    if 'token/' in list_auth_methods:
-        print(f"[+] token auth enable")
-    if 'userpass/' in list_auth_methods:
-        print(f"[+] userpass auth enable")
+    if auth_method['method_type']+"/" in list_auth_methods:
+        print(f'[info] {auth_method['method_type']} is enable \n[info] skipping enabling auth method')
     else:
         APP.sys.enable_auth_method(
             method_type=auth_method['method_type'],

@@ -52,7 +52,7 @@ def create_user_userpass():
 
 create_user_userpass()
 
-# Step41 - Login via userpass and get token
+# Step 4: Login via userpass and get token
 # Docs: https://hvac.readthedocs.io/en/stable/source/hvac_api_auth_methods.html
 def userpass_login(username, password):
     '''Функция выполняет логин в хранилище по логину и паролю метод userpass. Возвращает токен hvs.<...>'''
@@ -72,7 +72,7 @@ def userpass_login(username, password):
 
 userpass_token = userpass_login(username, password)
 
-# Step 5 - Create secret
+# Step 5: Create secret
 def create_secret():
     APP.secrets.kv.v2.create_or_update_secret(
     path='mykey/v1',
@@ -81,7 +81,7 @@ def create_secret():
 
 create_secret()
 
-# Step 6 - Read secret from vault
+# Step 6: Read secret from vault
 def read_secret():
     path='mykey/v1'
     secret = APP.secrets.kv.v2.read_secret(
