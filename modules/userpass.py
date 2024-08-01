@@ -1,25 +1,58 @@
 import hvac
 import hvac.exceptions
-from init_vault import create_acl_policy, enable_userpass_auth, create_user_userpass
+from init_vault import health_check, create_acl_policy, enable_auth_method
+from hvac.api.auth_methods.userpass import Userpass
 
 APP = hvac.Client()
+# вызвать текущий токен можно через APP.token там же можно его переназначить
 APP.token = 'test'
 
-# вызвать текущий токен можно через APP.token там же можно его переназначить
-
+# Userpass method similar to basic authentication with login and password
 username = 'test'
 password = '123'
 
 secret_name = 'key'
 secret_to_vault = 'Qwerty'
 
-# Step 0: initialize the vault and create user with policy
-create_acl_policy()
-enable_userpass_auth()
+policy = {
+        'name': 'kv-read-policy',
+        'policy': 'path "secret/*" { capabilities = [ "create", "read", "update", "list" ]}',
+    }
+
+auth_method = {
+    "method_type": 'userpass',
+    "description": 'Enable userpass authentification',
+    "path": 'userpass'
+}
+
+userpass_creds = {
+        "username": "test",
+        "password": "123",
+        "policies": ["kv-read-policy"],
+    }
+
+
+# Step 0: healthcheck the vault and init for userpass authentication
+health_check()
+
+# Step 1: Create ACL Policy
+create_acl_policy(policy)
+
+# Step 2: Enable userpass auth method
+enable_auth_method(auth_method)
+
+# Step 3 - Create user for userpass auth add ACL policy
+def create_user_userpass():
+    creds = userpass_creds
+    Userpass.create_or_update_user(APP, 
+                                   username=creds['username'], 
+                                   password=creds['password'], 
+                                   policies=creds['policies'])
+    print(f"[+] New user '{creds['username']}' created with policy '{creds['policies'][0]}'")
+
 create_user_userpass()
 
-
-# Step 1 - Login with creds at vault and get token
+# Step41 - Login via userpass and get token
 # Docs: https://hvac.readthedocs.io/en/stable/source/hvac_api_auth_methods.html
 def userpass_login(username, password):
     '''Функция выполняет логин в хранилище по логину и паролю метод userpass. Возвращает токен hvs.<...>'''
@@ -33,11 +66,13 @@ def userpass_login(username, password):
     except hvac.exceptions.InvalidRequest:
         print("[-] Invalid username or password")
         return None
+    except hvac.exceptions.InvalidPath:
+        print("[-] Invalid path")
+        return None
 
 userpass_token = userpass_login(username, password)
 
-# Step 2 - Login with creds at vault and create secret
-# Путь всегда уникален. Один путь один секрет ключ:значение
+# Step 5 - Create secret
 def create_secret():
     APP.secrets.kv.v2.create_or_update_secret(
     path='mykey/v1',
@@ -46,13 +81,13 @@ def create_secret():
 
 create_secret()
 
-# Step 3 - Read secret from vault
+# Step 6 - Read secret from vault
 def read_secret():
     path='mykey/v1'
     secret = APP.secrets.kv.v2.read_secret(
     path=path,
 )   
     secret_value = secret['data']['data']['secret_name']
-    print(f'[+] For path "{path}": secret value is "{secret_value}"')
+    print(f'[+] Secret is: path "{path}": with value is "{secret_value}"')
     
 read_secret()
