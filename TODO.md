@@ -5,8 +5,10 @@
 [+] #0.3. Make app modular
 
 #1. Authentification
-#1.1. Approle
+[+] #1.1. Approle
 [+] #1.2. Userpass 
+#1.3. TLS certificate
+#1.4. LDAP 
 
 #2. SecretEngine
 [+] #2.1. KV SecretEngine v2
@@ -32,3 +34,5 @@
 #6. Feature
 #6.1. seal/unseal
 #6.2. vault as OIDC Provider
+
+#7. K8S https://github.com/ducmeit1/vault-agent-tutorial

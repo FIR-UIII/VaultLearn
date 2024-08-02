@@ -1,0 +1,14 @@
+version: '3'
+services:
+  vault:
+    image: hashicorp/vault:latest
+    ports:
+      - 8200:8200
+
+  vault-agent:
+    image: hashicorp/vault-agent:latest
+    environment:
+      - VAULT_ADDR=http://0.0.0.0:8200
+      - VAULT_TOKEN=agent_demo
+    depends_on:
+      - vault
