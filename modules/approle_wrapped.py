@@ -48,31 +48,15 @@ def create_role():
     print(f"[+] New role '{creds['role_name']}' created with policy '{creds['policies'][0]}'")
     try: 
         result = AppRole.list_roles(APP, mount_point='approle')
-        print(f'[info] the role {result['data']['keys']} is created')
+        print(f'[info] the role {result['data']['keys']} was created before')
     except hvac.exceptions.InvalidPath:
         print("[-] no role found")
         
 create_role()
 
-# Step 4: Generate SecretID
-# Хорошая практика это доставка через trusted entity (k8s, jenkins, etc.)
-def generate_secret_id():
-    creds = approle_creds
-    secret_id = AppRole.generate_secret_id(APP, creds['role_name'], 
-                               metadata=None, 
-                               cidr_list=None, 
-                               token_bound_cidrs=None, 
-                               mount_point=creds['mount_point'], 
-                               wrap_ttl=None)
-    # Unwrap the token
-    # unwrapped_token = APP.auth.unwrap_token(secret_id['data']['accessor'])
-
-    print(f'[+] Success: secret id {secret_id['data']['secret_id']}')
-    return secret_id['data']['secret_id']
-
-secret_id = generate_secret_id()
 
 # Step 4: Get RoleID
+# Хорошая практика это доставка RoleID через trusted provider (k8s, jenkins, etc.). в данном случае мы напрямую мы обращаемся минуя провайдера
 def get_role_id():
     creds = approle_creds
     role_id = AppRole.read_role_id(APP, role_name=creds['role_name'], mount_point=creds['mount_point'])
@@ -80,7 +64,34 @@ def get_role_id():
     return role_id['data']['role_id']
 role_id = get_role_id()
 
-# Step 5: Login with RoleID & SecretID
+# Step 5: Request for wrapped Secret_ID
+# Хорошая практика это доставка Secret_ID через trusted provider (k8s, jenkins, etc.). в данном случае мы напрямую мы обращаемся минуя провайдера
+def generate_wrapped_secret_id():
+    creds = approle_creds
+    wrapped_secret = AppRole.generate_secret_id(APP, creds['role_name'], 
+                               metadata=None, 
+                               cidr_list=None, 
+                               token_bound_cidrs=None, 
+                               mount_point=creds['mount_point'], 
+                               wrap_ttl='5m')
+    # Unwrap the token
+    # unwrapped_token = APP.auth.unwrap_token(secret_id['data']['accessor'])
+
+    print(f'[+] Success: accessor for wrapped secret id {wrapped_secret['wrap_info']['accessor']}')
+    return wrapped_secret['wrap_info']['token']
+
+wrapped_secret = generate_wrapped_secret_id()
+
+
+# Step 6: Unwrapped Secret
+def get_unwrap_secret(wrapped_secret):
+    unwrap_response = APP.sys.unwrap(token=wrapped_secret)
+    print(f'[+] Success: unwrapped secret {unwrap_response['data']['secret_id']}')
+    return unwrap_response['data']['secret_id']
+
+unwrap_secret = get_unwrap_secret(wrapped_secret)
+
+# Step 7: Login with RoleID & SecretID
 def approle_login(role_id, secret_id):
     '''Функция выполняет логин в хранилище метод AppRole. Возвращает токен hvs.<...>'''
     try: 
@@ -96,10 +107,10 @@ def approle_login(role_id, secret_id):
         print("[-] Invalid path")
         return None
 
-token = approle_login(role_id, secret_id)
+token = approle_login(role_id, unwrap_secret)
 
-# Step 6: Create secret
+# Step 8: Create secret
 create_secret(token, secret_path='v1', secret_name = 'test_value_name', secret_to_vault = 'Qwerty123')
 
-# Step 7: Read secret from vault
+# Step 9: Read secret from vault
 read_secret(token, path='v1')

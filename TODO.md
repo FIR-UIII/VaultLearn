@@ -17,10 +17,9 @@
 #2.4. Transit
 #2.5. PKI
 
-
 #3. Integration
 #3.1. Agent
-#3.2. SDK
+[+] #3.2. SDK python hvac library
 #3.3. Sidecar
 
 #4. Key management + PKI
@@ -28,8 +27,8 @@
 #4.2. secret rotation
 
 #5. Token
-#5.1. Wrapping/unwrapping a token
-#5.2 token management https://hvac.readthedocs.io/en/stable/usage/auth_methods/token.html#token-management
+[+] #5.1. Wrapping/unwrapping a token
+#5.2. token management https://hvac.readthedocs.io/en/stable/usage/auth_methods/token.html#token-management
 
 #6. Feature
 #6.1. seal/unseal
