@@ -12,7 +12,8 @@ services:
     cap_add:
       - IPC_LOCK
     volumes:
-      - vault_data:/var/lib/vault
+      - vault_data:/var/lib/vault/file
+      - vault_data:/var/lib/vault/logs
     command: server -dev
 
 volumes:
