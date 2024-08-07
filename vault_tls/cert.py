@@ -1,20 +1,15 @@
 import hvac
+import os
 from hvac.api.auth_methods.cert import Cert
 from init_vault import health_check, create_acl_policy, enable_auth_method
 import urllib3
 
 urllib3.disable_warnings() # disable warnings in logs - need to clear
 
-
-cacert = "./certs/server.pem"
-cert=("./certs/client-signed-cert.pem", "./certs/client-private-key.pem")
-
-
-APP = hvac.Client(url="https://127.0.0.1:9200", token="hvs.7ZlguIL4WrFILfpc5fj3eq7e", verify=False, cert=cert)
-
+APP = hvac.Client(url="https://127.0.0.1:9200", verify=False)
 
 ### ENV
-APP.token = 'hvs.7ZlguIL4WrFILfpc5fj3eq7e' # export token
+APP.token = token=os.environ.get('VAULT_TOKEN')
 
 policy = {
         'name': 'kv-read-policy',
@@ -50,7 +45,6 @@ cert_role = {
 
 ### Step 0: Initialization
 health_check()
-
 
 ### Step 1: Create ACL policy
 create_acl_policy(policy)

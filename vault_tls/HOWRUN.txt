@@ -4,6 +4,9 @@ openssl genrsa -out ./certs/server.key 2048
 openssl req -new -x509 -key ./certs/server-privkey.pem -out ./certs/server-pub.pem -days 3650
 docker-compose -f docker-compose-tls.yml up -d 
 
+# export ENV
+export VAULT_TOKEN=
+
 # create client priv_key and cert_request
 openssl req -newkey rsa:2048 -nodes -days 365000 -keyout ./certs/client-private-key.pem -out ./certs/client.csr
 

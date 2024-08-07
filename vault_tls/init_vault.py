@@ -1,10 +1,11 @@
 import hvac
 import time
+import os
 import hvac.exceptions
 
 
 APP = hvac.Client(url="https://127.0.0.1:9200", verify=False)
-APP.token = 'hvs.7ZlguIL4WrFILfpc5fj3eq7e'
+APP.token = token=os.environ.get('VAULT_TOKEN')
 
 
 # docs: https://hvac.readthedocs.io/en/stable/usage/
