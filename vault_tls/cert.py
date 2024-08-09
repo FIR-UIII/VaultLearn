@@ -24,7 +24,7 @@ auth_method = {
 
 cert_role = {
     "name": "demo_certificate_role",
-    "certificate_file": "./certs/client-signed-cert.pem",
+    "certificate_file": "/Users/artem/Projects/VaultLearn/vault_tls/certs/server.pem",
     "allowed_common_names": ["*"],
     "allowed_dns_sans": [],
     "allowed_email_sans": [],
@@ -54,6 +54,7 @@ enable_auth_method(auth_method)
 
 ### Step 3: Create CA Certificate Role
 def create_ca_certificate_role(cert_role):
+    print(f'[start] creating CA certificate role: {cert_role["name"]}')
     try:
         Cert.create_ca_certificate_role(APP,
                                     name=cert_role['name'],
@@ -86,11 +87,21 @@ create_ca_certificate_role(cert_role)
 
 ### Step 4: Login and get token
 def login_cert(cert_role):
+    print(f'[start] login with cert role: {cert_role["name"]}')
     try:
         Cert.login(
                     APP,
                     name=cert_role['name'],
+                    cacert='/Users/artem/Projects/VaultLearn/vault_tls/certs/server.pem',
+                    cert_pem='/Users/artem/Projects/VaultLearn/vault_tls/certs/client-signed-cert.pem',
+                    key_pem='/Users/artem/Projects/VaultLearn/vault_tls/certs/client-private-key.pem',
                 )
     except Exception as e:
-        print(f"Caught an exception: {e}")
+        if "certificate" in str(e):  # Check if the error message contains "certificate"
+            print(f"[-] Error: {e}")
+            # Handle the certificate authentication error here
+            # For example, you can print a specific error message or retry the login process
+        else:
+            print(f"[-] Error: {e}")
+
 login_cert(cert_role)

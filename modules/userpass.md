@@ -1,3 +1,9 @@
+# Userpass
+Используется для пользовательского ввода/ например в UI.
+
+
+
+
 1. Enable userpass authentication and create user
 ```
 vault auth enable userpass

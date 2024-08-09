@@ -1,8 +1,18 @@
 # init vault server
 cd ~/vault_tls
+make sure that data is empty
+
+https://docs.informatica.com/data-security-group/data-archive/6-5-hotfix-1/data-vault-administrator-guide/data-vault-ssl-setup/generate-self-signed-certificates/step-2--generate-a-certificate-signing-request.html
 openssl genrsa -out ./certs/server.key 2048
 openssl req -new -x509 -key ./certs/server-privkey.pem -out ./certs/server-pub.pem -days 3650
 docker-compose -f docker-compose-tls.yml up -d 
+
+# docker CLI 
+vault operator init
+vault operator unseal
+vault status
+    Initialized.......true
+    Sealed............false
 
 # export ENV
 export VAULT_TOKEN=

@@ -8,8 +8,10 @@
 #1. Authentification
 [+] #1.1. Approle
 [+] #1.2. Userpass 
-#1.3. TLS certificate
+#1.3. TLS certificate [login error]
 #1.4. LDAP 
+#1.5. JWT AuthMethod
+#1.6. Gitlab JWT
 
 #2. SecretEngine
 [+] #2.1. KV SecretEngine v2

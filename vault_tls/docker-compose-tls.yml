@@ -7,6 +7,8 @@ services:
       VAULT_ADDR: "https://127.0.0.1:9200"
       VAULT_API_ADDR: "https://127.0.0.1:9200"
       VAULT_ADDRESS: "https://127.0.0.1:9200"
+      VAULT_SKIP_VERIFY: False
+      VAULT_CACERT: /certs/server.crt
     ports:
       - "9200:9200"
       - "9201:9201"
@@ -18,4 +20,4 @@ services:
       - ./file:/vault/file/:rw
     cap_add:
       - IPC_LOCK
-    entrypoint: vault server -config /vault/config/config.hcl -dev
+    entrypoint: vault server -config /vault/config/config.hcl

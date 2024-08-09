@@ -1,5 +1,6 @@
 import hvac
 import hvac.exceptions
+from kv2 import create_secret, read_secret
 from init_vault import health_check, create_acl_policy, enable_auth_method
 from hvac.api.auth_methods.userpass import Userpass
 
@@ -73,21 +74,7 @@ def userpass_login(username, password):
 userpass_token = userpass_login(username, password)
 
 # Step 5: Create secret
-def create_secret():
-    APP.secrets.kv.v2.create_or_update_secret(
-    path='mykey/v1',
-    secret=dict(secret_name=secret_to_vault))   
-    print('[+] Secret created')
-
-create_secret()
+create_secret(userpass_token, secret_path='v1', secret_name = 'test_value_name', secret_to_vault = 'Qwerty123')
 
 # Step 6: Read secret from vault
-def read_secret():
-    path='mykey/v1'
-    secret = APP.secrets.kv.v2.read_secret(
-    path=path,
-)   
-    secret_value = secret['data']['data']['secret_name']
-    print(f'[+] Secret is: path "{path}": with value is "{secret_value}"')
-    
-read_secret()
+read_secret(userpass_token, path='v1')
