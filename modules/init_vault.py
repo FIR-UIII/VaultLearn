@@ -1,10 +1,11 @@
 import hvac
 import time
 import hvac.exceptions
+import urllib3
 
+urllib3.disable_warnings() # disable warnings in logs - need to clear
 
-APP = hvac.Client(url="http://127.0.0.1:8200")
-APP.token = 'test'
+APP = hvac.Client(url="https://localhost:9200", verify=False, token="hvs.FKiI4f7Ch9cbpFSsIOc3fQBY")
 
 
 # docs: https://hvac.readthedocs.io/en/stable/usage/

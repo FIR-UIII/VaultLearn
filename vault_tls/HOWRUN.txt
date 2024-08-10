@@ -15,10 +15,32 @@ vault status
     Sealed............false
 
 # export ENV
-export VAULT_TOKEN=
+SH> export VAULT_TOKEN=
+PS> $env:VAULT_TOKEN=""
 
 # create client priv_key and cert_request
 openssl req -newkey rsa:2048 -nodes -days 365000 -keyout ./certs/client-private-key.pem -out ./certs/client.csr
 
 # sign the CSR with your root CA certificate
 openssl x509 -req -days 750 -in ./certs/client.csr -sha256 -CA ./certs/server.crt -CAkey ./certs/server.key -CAcreateserial -out ./certs/client-signed-cert.pem
+
+############################################## TEST
+touch selfsigned.cfr
+
+# create a self-signed certificate 
+openssl req -x509 -batch -nodes -newkey rsa:2048 -keyout server.key -out server.crt -config selfsigned.cfr -days 9999
+
+export VAULT_SKIP_VERIFY=true
+export VAULT_CACERT=/certs/server.crt
+
+add to OS host ca-bundle
+WIN> openssl x509 -outform der -in server.crt -out serverwin.crt
+run / mms / CTRL+M / certificates / Action>Import to trusted Root Certs
+
+### client
+openssl genrsa -out client.key 2048 <<< ключ CA для клиента
+openssl req -new -key client.key -out client.csr <<< реквест для подписи 
+openssl x509 -req -in client.csr -signkey client.key -out client.crt <<< подписанный сертификат клиента
+
+add cert to vault cert auth
+vault write auth/cert/certs/scripts display_name=scripts policies=scripts certificate=@client.crt

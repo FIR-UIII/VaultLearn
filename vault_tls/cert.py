@@ -6,14 +6,14 @@ import urllib3
 
 urllib3.disable_warnings() # disable warnings in logs - need to clear
 
-APP = hvac.Client(url="https://127.0.0.1:9200", verify=False)
+APP = hvac.Client(url="https://localhost:9200", verify=False, token="hvs.FKiI4f7Ch9cbpFSsIOc3fQBY")
 
 ### ENV
-APP.token = token=os.environ.get('VAULT_TOKEN')
+APP.token = os.environ.get('VAULT_TOKEN')
 
 policy = {
         'name': 'kv-read-policy',
-        'policy': 'path "secret/*" { capabilities = [ "create", "read", "update", "list" ]}',
+        'policy': 'path "kv/*" { capabilities = [ "create", "read", "update", "list" ]}',
     }
 
 auth_method = {
@@ -24,7 +24,7 @@ auth_method = {
 
 cert_role = {
     "name": "demo_certificate_role",
-    "certificate_file": "/Users/artem/Projects/VaultLearn/vault_tls/certs/server.pem",
+    "certificate_file": r"E:\Projects\VaultLearn\vault_tls\certs\client\client.crt",
     "allowed_common_names": ["*"],
     "allowed_dns_sans": [],
     "allowed_email_sans": [],
@@ -83,7 +83,7 @@ def create_ca_certificate_role(cert_role):
     except TypeError as e:
         print(f"[-] Error: {e}")
 
-create_ca_certificate_role(cert_role)
+# create_ca_certificate_role(cert_role)
 
 ### Step 4: Login and get token
 def login_cert(cert_role):
@@ -92,9 +92,9 @@ def login_cert(cert_role):
         Cert.login(
                     APP,
                     name=cert_role['name'],
-                    cacert='/Users/artem/Projects/VaultLearn/vault_tls/certs/server.pem',
-                    cert_pem='/Users/artem/Projects/VaultLearn/vault_tls/certs/client-signed-cert.pem',
-                    key_pem='/Users/artem/Projects/VaultLearn/vault_tls/certs/client-private-key.pem',
+                    cacert=r'E:\Projects\VaultLearn\vault_tls\certs\server.crt',
+                    cert_pem=r'E:\Projects\VaultLearn\vault_tls\certs\client\client.crt',
+                    key_pem=r'E:\Projects\VaultLearn\vault_tls\certs\client\client.key',
                 )
     except Exception as e:
         if "certificate" in str(e):  # Check if the error message contains "certificate"

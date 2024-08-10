@@ -8,7 +8,7 @@ storage "raft" {
 
 listener "tcp" {
   address = "[::]:9200"
-  tls_disable = "false"
+  tls_disable = false
   tls_cert_file = "/certs/server.crt"
   tls_key_file  = "/certs/server.key"
 }

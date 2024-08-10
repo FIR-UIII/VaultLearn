@@ -1,12 +1,16 @@
 import hvac
 import hvac.exceptions
+import os
 from kv2 import create_secret, read_secret
 from init_vault import health_check, create_acl_policy, enable_auth_method
 from hvac.api.auth_methods.userpass import Userpass
+import urllib3
 
-APP = hvac.Client()
-# вызвать текущий токен можно через APP.token там же можно его переназначить
-APP.token = 'test'
+urllib3.disable_warnings() # disable warnings in logs - need to clear
+
+
+APP = hvac.Client(url="https://localhost:9200", verify=False, token=os.environ.get("VAULT_TOKEN"))
+
 
 # Userpass method similar to basic authentication with login and password
 username = 'test'
@@ -73,8 +77,9 @@ def userpass_login(username, password):
 
 userpass_token = userpass_login(username, password)
 
+
 # Step 5: Create secret
-create_secret(userpass_token, secret_path='v1', secret_name = 'test_value_name', secret_to_vault = 'Qwerty123')
+create_secret(userpass_token, secret_path='kv', secret_name = 'test_value_name', secret_to_vault = 'Qwerty123')
 
 # Step 6: Read secret from vault
-read_secret(userpass_token, path='v1')
+read_secret(userpass_token, path='kv')
