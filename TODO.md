@@ -1,7 +1,7 @@
 # TASKS:
 #0. Bugfix or typo issues
-#0.1. Fix init of create_acl_policy() enable_userpass_auth() create_user_userpass(). Need to add param inside func 
-#0.2. Remove secrets into .env
+[+] #0.1. Fix init of create_acl_policy() enable_userpass_auth() create_user_userpass(). Need to add param inside func
+[+] #0.2. Remove secrets into .env
 [+] #0.3. Make app modular
 #0.4. __init__.py file for packages
 

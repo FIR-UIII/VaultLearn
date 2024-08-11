@@ -9,7 +9,7 @@ import urllib3
 urllib3.disable_warnings() # disable warnings in logs - need to clear
 
 
-APP = hvac.Client(url="https://localhost:9200", verify=False, token=os.environ.get("VAULT_TOKEN"))
+APP = hvac.Client(url=os.environ.get("VAULT_URL"), verify=False, token=os.environ.get("VAULT_TOKEN"))
 
 
 # Userpass method similar to basic authentication with login and password
@@ -17,7 +17,7 @@ username = 'test'
 password = '123'
 
 secret_name = 'key'
-secret_to_vault = 'Qwerty'
+secret_to_vault = 'DEMO_PASS'
 
 policy = {
         'name': 'kv-read-policy',
@@ -76,7 +76,6 @@ def userpass_login(username, password):
         return None
 
 userpass_token = userpass_login(username, password)
-
 
 # Step 5: Create secret
 create_secret(userpass_token, secret_path='kv', secret_name = 'test_value_name', secret_to_vault = 'Qwerty123')

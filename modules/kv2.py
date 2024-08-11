@@ -4,7 +4,7 @@ import os
 
 urllib3.disable_warnings() # disable warnings in logs - need to clear
 
-APP = hvac.Client(url="https://localhost:9200", verify=False, token=os.environ.get("VAULT_TOKEN"))
+APP = hvac.Client(url=os.environ.get("VAULT_URL"), verify=False, token=os.environ.get("VAULT_TOKEN"))
 
 
 def create_secret(token, secret_path, secret_name, secret_to_vault):

@@ -3,7 +3,7 @@ import time
 import os
 import hvac.exceptions
 
-print(os.environ.get("VAULT_TOKEN"))
+
 APP = hvac.Client(url="https://127.0.0.1:9200", verify=False, token=os.environ.get("VAULT_TOKEN"))
 
 

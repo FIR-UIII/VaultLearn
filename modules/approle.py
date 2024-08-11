@@ -1,11 +1,12 @@
 import hvac
 import hvac.exceptions
+import os
 from hvac.api.auth_methods.approle import AppRole
 from init_vault import health_check, create_acl_policy, enable_auth_method
 from kv2 import create_secret, read_secret
 
-APP = hvac.Client()
-APP.token = 'test'
+APP = hvac.Client(url=os.environ.get("VAULT_URL"), verify=False, token=os.environ.get("VAULT_TOKEN"))
+
 
 # Approle method like ................
 # https://hvac.readthedocs.io/en/stable/usage/auth_methods/approle.html
@@ -99,7 +100,7 @@ def approle_login(role_id, secret_id):
 token = approle_login(role_id, secret_id)
 
 # Step 6: Create secret
-create_secret(token, secret_path='v1', secret_name = 'test_value_name', secret_to_vault = 'Qwerty123')
+create_secret(token, secret_path='v1', secret_name = 'DEMO_APPROLE', secret_to_vault = 'DEMO_SECRET')
 
 # Step 7: Read secret from vault
 read_secret(token, path='v1')

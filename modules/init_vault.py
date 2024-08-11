@@ -2,15 +2,17 @@ import hvac
 import time
 import hvac.exceptions
 import urllib3
+import os
 
 urllib3.disable_warnings() # disable warnings in logs - need to clear
 
-APP = hvac.Client(url="https://localhost:9200", verify=False, token="hvs.FKiI4f7Ch9cbpFSsIOc3fQBY")
+APP = hvac.Client(url=os.environ.get("VAULT_URL"), verify=False, token=os.environ.get("VAULT_TOKEN"))
 
 
 # docs: https://hvac.readthedocs.io/en/stable/usage/
 # Step 0: healthcheck of the vault
 def check_vault_status():
+    print('[info] Checking enviroment setup')
     print('[info] Checking vault availability')
     status = APP.sys.read_seal_status()
     init_status = status['initialized']
@@ -24,6 +26,9 @@ def check_vault_status():
         return False
 
 def health_check():
+    if os.environ.get("VAULT_TOKEN") is None:
+        print('[-] VAULT_TOKEN is missing in the environment. Please export')
+        return False
     for _ in range(5):
         if check_vault_status():
             break
