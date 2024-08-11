@@ -4,6 +4,7 @@
 [+] #0.2. Remove secrets into .env
 [+] #0.3. Make app modular
 #0.4. __init__.py file for packages
+#0.5. TLS and cert errors
 
 #1. Authentification
 [+] #1.1. Approle

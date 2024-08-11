@@ -75,7 +75,7 @@ PS>     $env:VAULT_URL="https://localhost:9200"
 
 [Approle with wrapped token](media/AppRole_wrapped.svg)
 ```
-1. RUN approle+wrapped.py
+1. RUN approle_wrapped.py
 2. OUTCOME:
     [info] Checking enviroment setup
     [info] Checking vault availability
@@ -94,4 +94,12 @@ PS>     $env:VAULT_URL="https://localhost:9200"
     [info] trying create secret DEMO_APPROLE_WRAPPED with token hvs.<your_token> to v1
     [+] Secret created
     [+] Secret is: path "v1": value is "DEMO_SECRET"
+```
+
+JWT Authentication
+Когда применять: pipeline, back-2-back интеграции, выдача Bearer token для API
+Мисконфигурации и ошибки:
+```
+1. RUN jwt.py
+2. OUTCOME:
 ```

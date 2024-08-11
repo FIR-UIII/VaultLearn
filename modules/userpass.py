@@ -16,8 +16,8 @@ APP = hvac.Client(url=os.environ.get("VAULT_URL"), verify=False, token=os.enviro
 username = 'test'
 password = '123'
 
-secret_name = 'key'
-secret_to_vault = 'DEMO_PASS'
+secret_name = 'demo_key'
+secret_to_vault = 'DEMO_SECRET'
 
 policy = {
         'name': 'kv-read-policy',
