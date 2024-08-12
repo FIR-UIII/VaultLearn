@@ -1,27 +1,28 @@
 import hvac
 import hvac.exceptions
 import os
+import urllib3
 from kv2 import create_secret, read_secret
 from init_vault import health_check, create_acl_policy, enable_auth_method
 from hvac.api.auth_methods.userpass import Userpass
-import urllib3
-
-urllib3.disable_warnings() # disable warnings in logs - need to clear
 
 
-APP = hvac.Client(url=os.environ.get("VAULT_URL"), verify=False, token=os.environ.get("VAULT_TOKEN"))
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+
+APP = hvac.Client(url='https://localhost:9200', verify=False, token=os.environ.get('VAULT_TOKEN'))
 
 
 # Userpass method similar to basic authentication with login and password
 username = 'test'
 password = '123'
 
-secret_name = 'demo_key'
-secret_to_vault = 'DEMO_SECRET'
+secret_name = 'key'
+secret_to_vault = 'Qwerty'
 
 policy = {
         'name': 'kv-read-policy',
-        'policy': 'path "kv/*" { capabilities = [ "create", "read", "update", "list" ]}',
+        'policy': 'path "secret/*" { capabilities = [ "create", "read", "update", "list" ]}',
     }
 
 auth_method = {
@@ -47,15 +48,18 @@ create_acl_policy(policy)
 enable_auth_method(auth_method)
 
 # Step 3 - Create user for userpass auth add ACL policy
-def create_user_userpass():
-    creds = userpass_creds
-    Userpass.create_or_update_user(APP, 
-                                   username=creds['username'], 
-                                   password=creds['password'], 
-                                   policies=creds['policies'])
-    print(f"[+] New user '{creds['username']}' created with policy '{creds['policies'][0]}'")
+def create_user_userpass(userpass_creds):
+    print("[start] Creating user for userpass authentication")
+    try:
+        Userpass.create_or_update_user(APP, 
+                                   username=userpass_creds['username'], 
+                                   password=userpass_creds['password'], 
+                                   policies=userpass_creds['policies'])
+        print(f"[+] New user '{userpass_creds['username']}' created with policy '{userpass_creds['policies'][0]}'")
+    except Exception as e:
+        print(f"[-] Error creating user: {e}")
 
-create_user_userpass()
+create_user_userpass(userpass_creds)
 
 # Step 4: Login via userpass and get token
 # Docs: https://hvac.readthedocs.io/en/stable/source/hvac_api_auth_methods.html
@@ -78,7 +82,7 @@ def userpass_login(username, password):
 userpass_token = userpass_login(username, password)
 
 # Step 5: Create secret
-create_secret(userpass_token, secret_path='kv', secret_name = 'test_value_name', secret_to_vault = 'Qwerty123')
+create_secret(userpass_token, secret_path='/v1/kv/data/', secret_name = 'test_value_name', secret_to_vault = 'Qwerty123')
 
 # Step 6: Read secret from vault
-read_secret(userpass_token, path='kv')
+read_secret(userpass_token, path='v1')

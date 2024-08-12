@@ -14,7 +14,7 @@ APP = hvac.Client(url=os.environ.get("VAULT_URL"), verify=False, token=os.enviro
 # ENV
 policy = {
         'name': 'kv-read-policy',
-        'policy': 'path "secret/*" { capabilities = [ "create", "read", "update", "list" ]}',
+        'policy': 'path "kv/*" { capabilities = [ "create", "read", "update", "list" ]}',
     }
 
 auth_method = {

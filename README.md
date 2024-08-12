@@ -8,6 +8,8 @@ For Windows:
     a. Convert to DER: openssl x509 -outform der -in vault.crt -out vault_win.crt
     b. Open MMS: run > mms > CTRL+M > certificates > Action > Import to trusted Root Certs
 For MAC:
+    a. .cer" extension
+    b. sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain rootCA.crt
 
 3. (optional) Create a client certificate and key - for mTLS and cert authentication
 openssl genrsa -out client.key 2048
