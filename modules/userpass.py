@@ -66,7 +66,7 @@ def userpass_login(username, password):
         username=username,
         password=password)
         client_token = client_token_raw['auth']['client_token'] # парсим токен и получает только его значение
-        print(f"[+] Successfully get token: {client_token} with policies: {client_token_raw['auth']['token_policies']}")
+        print(f"[+] Successfully get token: {client_token[:30]}... with policies: {client_token_raw['auth']['token_policies']}")
         return client_token
     except hvac.exceptions.InvalidRequest:
         print("[-] Invalid username or password")

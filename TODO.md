@@ -7,6 +7,7 @@
 #0.5. TLS and cert errors
 #0.6. add hash of project of sha256sum
 #0.7. jwt.py Error: 'Client' has no attribute 'resolve_path'
+[+] #0.8. hide secret in console
 
 #1. Authentification
 [+] #1.1. Approle

@@ -98,7 +98,7 @@ def approle_login(role_id, secret_id):
     try: 
         client_token_raw = APP.auth.approle.login(role_id=role_id, secret_id=secret_id)
         client_token = client_token_raw['auth']['client_token'] # парсим токен и получает только его значение
-        print(f"[+] Successfully get token: {client_token} with policies: {client_token_raw['auth']['token_policies']}")
+        print(f"[+] Successfully get token: {client_token[:30]}... with policies: {client_token_raw['auth']['token_policies']}")
         APP.token = client_token
         return APP.token
     except hvac.exceptions.InvalidRequest:
