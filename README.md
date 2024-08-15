@@ -104,4 +104,22 @@ JWT Authentication
 ```
 1. RUN jwt.py
 2. OUTCOME:
+    [info] Checking enviroment setup
+    [info] Checking vault availability
+    [info] vault is running: True 
+    [info] vault sealed: False
+    [+] vault is ready
+    [+] active policies: ['default', 'kv-read-policy', 'root']
+    [info] jwt is enable 
+    [info] skipping enabling auth method
+    [info] Creating role for JWT authentification
+    [+] Success: demo_jwt is enabled
+    [info] Creating JWT auth configuration
+    [+] Success: Creating JWT auth configuration
+    [+] Success: created jwt_token: eyJhbGciOiJ...
+    [info] Trying to login
+    [+] Success: get client token: hvs.<your_token>
+    [info] trying create secret DEMO_APPROLE with token hvs.<your_token> to v1
+    [+] Secret created
+    [+] Secret is: path "v1": value is "DEMO_SECRET"
 ```

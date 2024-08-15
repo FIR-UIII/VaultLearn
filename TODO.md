@@ -14,7 +14,7 @@
 [+] #1.2. Userpass 
 #1.3. TLS certificate [login error]
 #1.4. LDAP 
-#1.5. JWT AuthMethod
+[+] #1.5. JWT AuthMethod
 #1.6. Gitlab JWT
 
 #2. SecretEngine

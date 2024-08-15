@@ -80,7 +80,7 @@ create_config()
 
 # curl --header "X-Vault-Token: test" http://127.0.0.1:8200/v1/auth/jwt/config
 
-# Step 5: Create-Get JWT token
+# Step 5: Get JWT token (from JWT provider)
 
 # openssl genrsa -out private.pem 2048
 # openssl rsa -in private.pem -outform PEM -pubout -out pubkey.pem
