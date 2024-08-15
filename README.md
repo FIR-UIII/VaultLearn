@@ -98,7 +98,7 @@ PS>     $env:VAULT_URL="https://localhost:9200"
     [+] Secret is: path "v1": value is "DEMO_SECRET"
 ```
 
-JWT Authentication
+[JWT Authentication](media/jwt_auth.svg)
 Когда применять: pipeline, back-2-back интеграции, выдача Bearer token для API
 Мисконфигурации и ошибки:
 ```
