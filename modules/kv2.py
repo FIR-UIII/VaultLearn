@@ -10,7 +10,7 @@ APP = hvac.Client(url=os.environ.get("VAULT_URL"), verify=False, token=os.enviro
 def create_secret(token, secret_path, secret_name, secret_to_vault):
     try:
         APP.token = token
-        print(f'[info] trying create secret {secret_name} with token {APP.token} to {secret_path}')
+        print(f'[info] trying create secret {secret_name} with token {APP.token[:30]}... to {secret_path}')
         APP.secrets.kv.v2.create_or_update_secret(
                                 path=secret_path,
                                 secret=dict(secret_name = secret_to_vault),

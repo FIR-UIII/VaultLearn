@@ -29,7 +29,7 @@ $ vault status
 
 6. Export token to ENV
 bash$   export VAULT_TOKEN=hvs.[put_here]
-bash$   export VAULT_URL=https://localhost:9200
+bash$   export VAULT_URL=http://localhost:8200
 PS>     $env:VAULT_TOKEN="hvs.[put_here]"
 PS>     $env:VAULT_URL="https://localhost:9200"
 ```

@@ -1,6 +1,8 @@
 import os
 import hvac
 import jwt
+from create_jwt_token import create_jwt_token
+from hvac.api.auth_methods.jwt import JWT
 import urllib3
 from kv2 import create_secret, read_secret
 from init_vault import health_check, create_acl_policy, enable_auth_method
@@ -12,7 +14,7 @@ APP = hvac.Client(url=os.environ.get("VAULT_URL"), verify=False, token=os.enviro
 # ENV
 policy = {
         'name': 'kv-read-policy',
-        'policy': 'path "kv/*" { capabilities = [ "create", "read", "update", "list" ]}',
+        'policy': 'path "kv/*" { capabilities = [ "create", "read", "update", "list" ]}, path "secret/*" { capabilities = [ "create", "read", "update", "list" ]}',
     }
 
 auth_method = {
@@ -26,14 +28,6 @@ jwt_config = {
         "policies": ["kv-read-policy"],
         "mount_point": "jwt"
     }
-
-# Payload for JWT
-payload = {
-    "sub": "1234567890",
-    "name": "John Doe",
-    "admin": True
-}
-key = 'vault'
 
 # Step 0: Helthcheck
 health_check()
@@ -57,8 +51,9 @@ def create_jwt_role(jwt_config):
             APP.auth.jwt.create_role(
                                     name=jwt_config['role_name'],
                                     role_type='jwt',
-                                    user_claim='sub',
-                                    bound_audiences=['12345'],
+                                    allowed_redirect_uris=['http://localhost:8200'],
+                                    user_claim='user_mail',
+                                    token_policies=jwt_config['policies']
                                 )
             print(f'[+] Success: {jwt_config['role_name']} is enabled')
         except Exception as e:
@@ -67,31 +62,59 @@ def create_jwt_role(jwt_config):
 
 create_jwt_role(jwt_config)
 
-# Step 4: Create-Get JWT token
-def encode_jwt(key, payload):
-    encoded = jwt.encode(payload, key, algorithm="HS256")
-    print("[+] Success: created JWT:", encoded)
-    return encoded
+# Step 4: Create JWT configuration
+def create_config():
+    print('[info] Creating JWT auth configuration')
+    '''One (and only one) of oidc_discovery_url and jwt_validation_pubkeys must be set.'''
+    try:
+        JWT.configure(APP,
+                        jwt_validation_pubkeys="vault_tls/file/pubkey.pem",
+                        jwt_supported_algs=['RS256'],
+                        path='jwt'
+                    )
+        print('[+] Success: Creating JWT auth configuration')
+    except Exception as e:
+         print(f'[-] Raise error: {e}')
 
-jwt_token = encode_jwt(key, payload)
+create_config()
 
-# Step 5: Login with JWT
+# curl --header "X-Vault-Token: test" http://127.0.0.1:8200/v1/auth/jwt/config
+
+# Step 5: Create-Get JWT token
+
+# openssl genrsa -out private.pem 2048
+# openssl rsa -in private.pem -outform PEM -pubout -out pubkey.pem
+# vault write auth/jwt/config jwt_validation_pubkeys=@pubkey.pem
+
+# OR 
+
+# ssh-keygen -t rsa -b 4096 -m PEM -f keys/jwtRS256.key
+# openssl rsa -in keys/jwtRS256.key -pubout -outform PEM -out keys/jwtRS256.key.pub
+# https://github.com/ryan95f/vault-jwt-auth-example/blob/main/gen_token.py
+
+jwt_token = create_jwt_token()
+print(f'[+] Success: created jwt_token: {jwt_token[:30]}...')
+
+# Step 6: Login with JWT
 def jwt_login(jwt_config):
     print('[info] Trying to login')
-    response = APP.auth.jwt.jwt_login(
+    try:
+        response = APP.auth.jwt.jwt_login(
                                     role=jwt_config['role_name'],
                                     jwt=jwt_token,
                                     use_token=True, 
                                     path='jwt/'
                                 )
-    print('Client token returned: %s' % response['auth']['client_token'])
+        print('[+] Success: get client token: %s' % response['auth']['client_token'][:30]+"...")
+        client_token = response['auth']['client_token']
+        return client_token
+    except Exception as e:
+         print(f'[-] Raise error: {e}')
 
+client_token = jwt_login(jwt_config)
 
-jwt_login(jwt_config)
+# Step 7: Create secret
+create_secret(client_token, secret_path='v1', secret_name = 'DEMO_APPROLE', secret_to_vault = 'DEMO_SECRET')
 
-# Step 6: Create secret
-# create_secret(token, secret_path='v1', secret_name = 'DEMO_APPROLE', secret_to_vault = 'DEMO_SECRET')
-
-# Step 7: Read secret from vault
-# read_secret(token, path='v1')
-
+# Step 8: Read secret from vault
+read_secret(client_token, path='v1')

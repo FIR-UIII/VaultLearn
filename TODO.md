@@ -5,6 +5,8 @@
 [+] #0.3. Make app modular
 #0.4. __init__.py file for packages
 #0.5. TLS and cert errors
+#0.6. add hash of project of sha256sum
+#0.7. jwt.py Error: 'Client' has no attribute 'resolve_path'
 
 #1. Authentification
 [+] #1.1. Approle
