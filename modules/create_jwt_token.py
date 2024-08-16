@@ -9,9 +9,8 @@ def load_private_key(filepath):
         return file.read()
 
 
-def create_jwt_token():
-    private_key = load_private_key('vault_tls/file/private.pem')
-
+def create_jwt_token(path_to_jwt_pub_cert):
+    private_key = load_private_key(path_to_jwt_pub_cert)
     iat = datetime.now(tz=timezone.utc)
     claims = {
         "iss": "main",

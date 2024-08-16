@@ -3,7 +3,7 @@ import hvac.exceptions
 import os
 from hvac.api.auth_methods.approle import AppRole
 from init_vault import health_check, create_acl_policy, enable_auth_method
-from kv2 import create_secret, read_secret
+from secret_engine.kv2 import create_secret, read_secret
 
 APP = hvac.Client(url=os.environ.get("VAULT_URL"), verify=False, token=os.environ.get("VAULT_TOKEN"))
 

@@ -1,10 +1,9 @@
 import os
 import hvac
-import jwt
 from create_jwt_token import create_jwt_token
 from hvac.api.auth_methods.jwt import JWT
 import urllib3
-from kv2 import create_secret, read_secret
+from secret_engine.kv2 import create_secret, read_secret
 from init_vault import health_check, create_acl_policy, enable_auth_method
 
 urllib3.disable_warnings() # disable warnings in logs
@@ -26,8 +25,15 @@ auth_method = {
 jwt_config = {
         "role_name": "demo_jwt",
         "policies": ["kv-read-policy"],
-        "mount_point": "jwt"
+        "mount_point": "jwt",
+        "user_claim": "user_mail",
+        "allowed_redirect_uris": ['http://localhost:8200'],
+        "role_type": "jwt",
+        "jwt_validation_pubkeys": "vault_tls/file/pubkey.pem",
+        "jwt_supported_algs": ['RS256']
     }
+
+path_to_jwt_pub_cert = 'vault_tls/file/private.pem'
 
 # Step 0: Helthcheck
 health_check()
@@ -50,9 +56,9 @@ def create_jwt_role(jwt_config):
             print('[info] Creating role for JWT authentification')
             APP.auth.jwt.create_role(
                                     name=jwt_config['role_name'],
-                                    role_type='jwt',
-                                    allowed_redirect_uris=['http://localhost:8200'],
-                                    user_claim='user_mail',
+                                    role_type=jwt_config['role_type'],
+                                    allowed_redirect_uris=jwt_config['allowed_redirect_uris'],
+                                    user_claim=jwt_config['user_claim'],
                                     token_policies=jwt_config['policies']
                                 )
             print(f'[+] Success: {jwt_config['role_name']} is enabled')
@@ -63,36 +69,23 @@ def create_jwt_role(jwt_config):
 create_jwt_role(jwt_config)
 
 # Step 4: Create JWT configuration
-def create_config():
+def create_config(jwt_config):
     print('[info] Creating JWT auth configuration')
     '''One (and only one) of oidc_discovery_url and jwt_validation_pubkeys must be set.'''
     try:
         JWT.configure(APP,
-                        jwt_validation_pubkeys="vault_tls/file/pubkey.pem",
-                        jwt_supported_algs=['RS256'],
-                        path='jwt'
+                        jwt_validation_pubkeys=jwt_config['jwt_validation_pubkeys'],
+                        jwt_supported_algs=jwt_config['jwt_supported_algs'],
+                        path=jwt_config['mount_point']
                     )
         print('[+] Success: Creating JWT auth configuration')
     except Exception as e:
          print(f'[-] Raise error: {e}')
 
-create_config()
+create_config(jwt_config)
 
-# curl --header "X-Vault-Token: test" http://127.0.0.1:8200/v1/auth/jwt/config
-
-# Step 5: Get JWT token (from JWT provider)
-
-# openssl genrsa -out private.pem 2048
-# openssl rsa -in private.pem -outform PEM -pubout -out pubkey.pem
-# vault write auth/jwt/config jwt_validation_pubkeys=@pubkey.pem
-
-# OR 
-
-# ssh-keygen -t rsa -b 4096 -m PEM -f keys/jwtRS256.key
-# openssl rsa -in keys/jwtRS256.key -pubout -outform PEM -out keys/jwtRS256.key.pub
-# https://github.com/ryan95f/vault-jwt-auth-example/blob/main/gen_token.py
-
-jwt_token = create_jwt_token()
+# Step 5: Create JWT token
+jwt_token = create_jwt_token(path_to_jwt_pub_cert)
 print(f'[+] Success: created jwt_token: {jwt_token[:30]}...')
 
 # Step 6: Login with JWT
@@ -103,7 +96,7 @@ def jwt_login(jwt_config):
                                     role=jwt_config['role_name'],
                                     jwt=jwt_token,
                                     use_token=True, 
-                                    path='jwt/'
+                                    path=jwt_config['mount_point']
                                 )
         print('[+] Success: get client token: %s' % response['auth']['client_token'][:30]+"...")
         client_token = response['auth']['client_token']

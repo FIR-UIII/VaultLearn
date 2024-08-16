@@ -34,7 +34,7 @@ PS>     $env:VAULT_TOKEN="hvs.[put_here]"
 PS>     $env:VAULT_URL="https://localhost:9200"
 ```
 
-# Project info
+# Authentification methods
 [userpass](media/userpass.svg)
 ```
 1. RUN userpass.py
@@ -102,8 +102,13 @@ PS>     $env:VAULT_URL="https://localhost:9200"
 Когда применять: pipeline, back-2-back интеграции, выдача Bearer token для API
 Мисконфигурации и ошибки:
 ```
-1. RUN jwt.py
-2. OUTCOME:
+1. Configure JWT
+# openssl genrsa -out private.pem 2048
+# openssl rsa -in private.pem -outform PEM -pubout -out pubkey.pem
+# vault write auth/jwt/config jwt_validation_pubkeys=@pubkey.pem OR via UI use pub key
+# configure JWT claims in create_jwt_token.py and jwt_config in jwt.py
+2. RUN jwt.py
+3. OUTCOME:
     [info] Checking enviroment setup
     [info] Checking vault availability
     [info] vault is running: True 
@@ -122,4 +127,11 @@ PS>     $env:VAULT_URL="https://localhost:9200"
     [info] trying create secret DEMO_APPROLE with token hvs.<your_token> to v1
     [+] Secret created
     [+] Secret is: path "v1": value is "DEMO_SECRET"
+```
+
+# Secret engines
+### Database
+```
+cd secret_engine
+docker-compose -f docker-compose-psql.yml up -d
 ```

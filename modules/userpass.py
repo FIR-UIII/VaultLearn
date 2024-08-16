@@ -1,7 +1,7 @@
 import hvac
 import hvac.exceptions
 import os
-from kv2 import create_secret, read_secret
+from secret_engine.kv2 import create_secret, read_secret
 from init_vault import health_check, create_acl_policy, enable_auth_method
 from hvac.api.auth_methods.userpass import Userpass
 import urllib3

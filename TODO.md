@@ -20,6 +20,7 @@
 #2. SecretEngine
 [+] #2.1. KV SecretEngine v2
 #2.2. Database
+    Собрать докер сеть и БД в ней + подготовить БД и пользователя
 #2.3. LDAP
 #2.4. Transit
 #2.5. PKI
