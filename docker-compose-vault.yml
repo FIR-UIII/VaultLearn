@@ -1,8 +1,12 @@
 version: '3.8'
 services:
+  
+  # vault server
   vault:
     image: hashicorp/vault
     container_name: vault
+    networks:
+      - "vault"
     ports:
       - "8200:8200"
     environment:
@@ -12,8 +16,23 @@ services:
     cap_add:
       - IPC_LOCK
     volumes:
-      - vault_data:/var/lib/vault
+      - ./vault_tls/logs:/vault/logs/:rw
+      - ./vault_tls/data:/vault/data/:rw
+      - ./vault_tls/config:/vault/config/:rw
+      - ./vault_tls/certs:/certs/:rw
+      - ./vault_tls/file:/vault/file/:rw
     command: server -dev
-
+  
+  # Postgres
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+    networks:
+      - "vault"
+    ports:
+      - "5432:5432"
 volumes:
   vault_data:

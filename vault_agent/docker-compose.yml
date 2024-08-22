@@ -1,0 +1,33 @@
+# https://gitlab.com/kawsark/vault-agent-docker/-/blob/master/docker-compose.yml?ref_type=heads
+version: '3'
+services:
+  vault_devserver:
+    image: hashicorp/vault:latest
+    restart: always
+    volumes:
+      - /vault/data
+      - /etc/vault/logs
+    ports:
+      - "8200:8200/tcp"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: 'test'
+      VAULT_DEV_LISTEN_ADDRESS: '0.0.0.0:8200'
+    cap_add:
+      - IPC_LOCK
+    container_name: vault_dev
+    entrypoint: "vault server -dev"
+
+
+  vault-agent:
+    image: hashicorp/vault-agent:latest
+    environment:
+      - VAULT_ADDR=http://0.0.0.0:8200
+      - VAULT_TOKEN=agent_demo
+    depends_on:
+      - vault
+    entrypoint: "vault agent -log-level debug -config=/vault-agent/vault-agent.hcl"
+
+  app:
+    image: my_app_image
+    depends_on:
+      - vault-agent

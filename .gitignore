@@ -1,12 +1,21 @@
+# Demo files
+*.crt
+*.key
+*.db
+*.csr 
+*.pem
+*.srl
+*.pub
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 *$pyc.class
+.DS_Store
 
 # C extensions
 *.so
-*.md
 
 # Distribution / packaging
 .Python
