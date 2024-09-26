@@ -11,13 +11,13 @@ database_config = {
 'name': 'mydatabase',
 'plugin_name': 'postgresql-database-plugin',
 'allowed_roles': 'role-name',
-'connection_url': 'postgresql://{username}:{password}@postgres:5432/postgres?sslmode=disable',
+'connection_url': 'postgresql://{{username}}:{{password}}@postgres:5432/postgres?sslmode=disable',
 'username': 'myuser',
 'password': 'mypassword'
 }
 
 # Step 1: Enable Database Secrets Engine
-def enable_database_secrets():  
+def enable_database_secrets(): 
     if APP.sys.list_mounted_secrets_engines()['database/'] is None:
         print('[start] Step 1: Enable Database Secrets Engine')
         try:
@@ -53,3 +53,9 @@ def configure_database(database_config):
 if __name__ == '__main__':
     enable_database_secrets()
     configure_database(database_config)
+
+# https://github.com/Tylerlhess/docker-vault-consul-postgres/blob/master/pythonScript.py
+# https://developer.hashicorp.com/vault/docs/secrets/databases/postgresql
+# https://developer.hashicorp.com/vault/tutorials/db-credentials/database-secrets 
+# https://dev.to/breda/dynamic-postgresql-credentials-using-hashicorp-vault-with-php-symfony-go-examples-4imj
+# https://hvac.readthedocs.io/en/stable/usage/secrets_engines/database.html#enable-database-secrets-engine
