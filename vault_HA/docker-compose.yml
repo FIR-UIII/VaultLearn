@@ -1,0 +1,81 @@
+version: '3'
+services:
+  vault_1:
+    image: hashicorp/vault
+    container_name: vault_1
+    environment:
+      - VAULT_ADDR=https://192.168.100.2:9200
+      - VAULT_API_ADDR=https://192.168.100.2:9200
+      - VAULT_ADDRESS=https://192.168.100.2:9200
+      - VAULT_SKIP_VERIFY=True
+      - VAULT_CACERT=/certs/vault-ca-cert.pem
+    networks:
+      cluster_dev:
+        ipv4_address: 192.168.100.2
+    ports:
+      - 9100:9200
+      - 9101:9201
+    volumes:
+      - ./vault_1/data:/vault/data/:rw
+      - ./vault_1/config:/vault/config/:rw
+      - ./vault_1/certs:/certs/:rw
+    cap_add:
+      - IPC_LOCK
+    entrypoint: vault server -config /vault/config/vault_1.hcl
+
+  # НОДА 2
+  vault_2:
+    image: hashicorp/vault
+    container_name: vault_2
+    environment:
+      - VAULT_ADDR=https://192.168.100.3:9200
+      - VAULT_API_ADDR=https://192.168.100.3:9200
+      - VAULT_ADDRESS=https://192.168.100.3:9200
+      - VAULT_SKIP_VERIFY=True
+      - VAULT_CACERT=/certs/vault-ca-cert.pem
+    networks:
+      cluster_dev:
+        ipv4_address: 192.168.100.3
+    ports:
+      - 9200:9200
+      - 9201:9201
+    volumes:
+      - ./vault_2/data:/vault/data/:rw
+      - ./vault_2/config:/vault/config/:rw
+      - ./vault_2/certs:/certs/:rw
+    cap_add:
+      - IPC_LOCK
+    entrypoint: vault server -config /vault/config/vault_2.hcl
+
+  # НОДА 3
+  vault_3:
+    image: hashicorp/vault
+    container_name: vault_3
+    environment:
+      - VAULT_ADDR=https://192.168.100.4:9200
+      - VAULT_API_ADDR=https://192.168.100.4:9200
+      - VAULT_ADDRESS=https://192.168.100.4:9200
+      - VAULT_SKIP_VERIFY=True
+      - VAULT_CACERT=/certs/vault-ca-cert.pem
+    networks:
+      cluster_dev:
+        ipv4_address: 192.168.100.4
+    ports:
+      - 9300:9200
+      - 9301:9201
+    volumes:
+      - ./vault_3/data:/vault/data/:rw
+      - ./vault_3/config:/vault/config/:rw
+      - ./vault_3/certs:/certs/:rw
+    cap_add:
+      - IPC_LOCK
+    entrypoint: vault server -config /vault/config/vault_3.hcl
+
+networks:
+  cluster_dev:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.100.0/24
+          gateway: 192.168.100.1
