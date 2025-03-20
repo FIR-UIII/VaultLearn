@@ -1,0 +1,89 @@
+version: '3'
+services:
+  database:
+    image: postgres:17
+    container_name: postgresql
+    ports:
+    - 5432:5432
+    restart: always
+    environment:
+      POSTGRES_USER: vault
+      POSTGRES_PASSWORD: strongpassword
+      POSTGRES_DB: vault
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "vault"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  vault_1:
+    image: hashicorp/vault
+    container_name: vault_1
+    restart: always
+    ports:
+    - 8201:8200
+    environment:
+      VAULT_ADDR: "http://0.0.0.0:8200" # Environment variable to access Vault
+    volumes:
+      - ./vault.hcl:/vault/config/vault.hcl:ro # Mount your Vault configuration
+    entrypoint: >
+      vault server -config=/vault/config/vault.hcl
+    cap_add:
+      - IPC_LOCK # Required to lock memory for security
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8200/v1/sys/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+    - database
+
+  vault_2:
+    image: hashicorp/vault
+    container_name: vault_2
+    restart: always
+    ports:
+    - 8202:8200
+    environment:
+      VAULT_ADDR: "http://0.0.0.0:8200" # Environment variable to access Vault
+    volumes:
+      - ./vault.hcl:/vault/config/vault.hcl:ro # Mount your Vault configuration
+    entrypoint: >
+      vault server -config=/vault/config/vault.hcl
+    cap_add:
+      - IPC_LOCK # Required to lock memory for security
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8200/v1/sys/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+    - database
+
+  vault_3:
+    image: hashicorp/vault
+    container_name: vault_3
+    restart: always
+    ports:
+    - 8203:8200
+    environment:
+      VAULT_ADDR: "http://0.0.0.0:8200" # Environment variable to access Vault
+    volumes:
+      - ./vault.hcl:/vault/config/vault.hcl:ro # Mount your Vault configuration
+    entrypoint: >
+      vault server -config=/vault/config/vault.hcl
+    cap_add:
+      - IPC_LOCK # Required to lock memory for security
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8200/v1/sys/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+    - database
+
+volumes:
+  postgres_data:
