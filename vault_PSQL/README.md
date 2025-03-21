@@ -1,11 +1,11 @@
 Данная директория содержит манифест docker-compose для быстрого поднятия кластера vault PostgreSQL:
-.
+```sh
+# Структура
 |__postgresql 
 |__vault_1 
 |__vault_2
 |__vault_3
 
-```sh
 # поднятие кластера
 docker-compose -f docker-compose.yaml up -d --build
 
