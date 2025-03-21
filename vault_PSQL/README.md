@@ -1,11 +1,13 @@
 Данная директория содержит манифест docker-compose для быстрого поднятия кластера vault PostgreSQL:
-```sh
-# Структура
-|__postgresql 
-|__vault_1 
-|__vault_2
-|__vault_3
 
+|Имя пода    | IP адрес      |
+|------------| ------------- |
+| postgresql | 192.168.100.2 |
+| vault_1    | 192.168.100.5 |
+| vault_2    | 192.168.100.3 |
+| vault_3    | 192.168.100.4 |
+
+```sh
 # поднятие кластера
 docker-compose -f docker-compose.yaml up -d --build
 
